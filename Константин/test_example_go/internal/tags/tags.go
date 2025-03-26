@@ -22,6 +22,9 @@ const (
 const (
 	OutputConveyorRight = "ns=4;i=19"
 	OutputConveyorLeft  = "ns=4;i=20"
+
+	OutputGripperLeft  = "ns=4;i=38"
+	OutputGripperRight = "ns=4;i=37"
 )
 
 // hs

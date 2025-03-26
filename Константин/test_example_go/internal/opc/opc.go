@@ -10,7 +10,19 @@ import (
 	"github.com/gopcua/opcua/ua"
 )
 
-func GetNodeValue(nodeId string, client *opcua.Client) {
+const connString = "opc.tcp://10.160.160.61:4840"
+
+type MyClient struct {
+	*opcua.Client
+}
+
+func NewClient() *MyClient {
+	return &MyClient{
+		opcua.NewClient(connString, opcua.SecurityMode(ua.MessageSecurityModeNone), opcua.DialTimeout(time.Second*5)),
+	}
+}
+
+func (c *MyClient) GetNodeValue(nodeId string) bool {
 	id, err := ua.ParseNodeID(nodeId)
 	if err != nil {
 		log.Fatal(err)
@@ -26,7 +38,7 @@ func GetNodeValue(nodeId string, client *opcua.Client) {
 
 	var resp *ua.ReadResponse
 	for {
-		resp, err = client.Read(req)
+		resp, err = c.Read(req)
 		if err == nil {
 			break
 		}
@@ -35,7 +47,7 @@ func GetNodeValue(nodeId string, client *opcua.Client) {
 		// Best practice is to do it on read operations.
 		log.Println(err.Error())
 		switch {
-		case err == io.EOF && client.State() != opcua.Closed:
+		case err == io.EOF && c.State() != opcua.Closed:
 			// has to be retried unless user closed the connection
 			time.After(1 * time.Second)
 			continue
@@ -64,10 +76,10 @@ func GetNodeValue(nodeId string, client *opcua.Client) {
 		log.Fatalf("Status not OK: %v", resp.Results[0].Status)
 	}
 
-	log.Printf("%#v", resp.Results[0].Value.Value())
+	return resp.Results[0].Value.Bool()
 }
 
-func WriteNodeValue[T any](nodeId string, value T, client *opcua.Client) {
+func (c *MyClient) WriteNodeValue(nodeId string, value bool) error {
 	id, err := ua.ParseNodeID(nodeId)
 	if err != nil {
 		log.Fatal(err)
@@ -91,9 +103,10 @@ func WriteNodeValue[T any](nodeId string, value T, client *opcua.Client) {
 		},
 	}
 
-	resp, err := client.Write(req)
-	if err != nil {
+	resp, err := c.Write(req)
+	if err != nil || resp.Results[0] != ua.StatusOK {
 		log.Fatalf("Write failed: %s", err)
 	}
-	log.Printf("%v", resp.Results[0])
+
+	return nil
 }
