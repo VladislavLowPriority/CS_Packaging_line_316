@@ -1,0 +1,58 @@
+openapi: 3.0.0
+info:
+  title: backend service
+  description: Сервис для управления установкой в 316 аудитории к.16
+  version: 1.0.0
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+paths:
+  /start:
+    post:
+      summary: Запуск установки
+      responses:
+        '200':
+          description: Успешный запуск
+        '403':
+          description: Установка не в начальном положении
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /stop:
+    post:
+      summary: Остановка установки
+      responses:
+        '200':
+          description: Успешная остановка
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /default:
+    post:
+      summary: Возврат установки в начальное положение
+      responses:
+        '200':
+          description: Установка в начальном положении
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
