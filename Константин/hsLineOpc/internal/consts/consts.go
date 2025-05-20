@@ -1,5 +1,12 @@
 package consts
 
+// TS
+const (
+	TsStartHs     = "ns=1;i=51"
+	TsStopHs      = "ns=1;i=52"
+	TsBackToStart = "ns=1;i=53"
+)
+
 // inputs
 const (
 	InputBoxOnConveyor = "ns=4;i=9"

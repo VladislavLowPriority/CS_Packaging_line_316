@@ -1,36 +1,50 @@
 package main
 
 import (
+	"context"
 	"hsLineOpc/api"
 	"hsLineOpc/internal/handler"
-	"log"
+	"hsLineOpc/pkg/logger"
 	"log/slog"
-	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
-///go:generate go tool oapi-codegen -config ../api/config.yaml ../api/swagger.yaml
-
 func main() {
 	godotenv.Load()
+	logger.SetupLogging(slog.LevelDebug)
 
-	cfg := handler.Config{
-		Port: os.Getenv("SERVER_PORT"),
-	}
+	tsServ := api.NewTsClient()
+	tsServ.SubscribeTs()
+	slog.Info("TS server tags subscribed")
 
-	server := handler.NewServer()
-	mux := http.NewServeMux()
-	h := api.HandlerFromMux(server, mux)
+	opcConn := os.Getenv("OPC_SERVER_IP") + ":" + os.Getenv("OPC_SERVER_PORT")
+	opcClient := api.NewClient(opcConn)
+	slog.Info("HS client created")
 
-	srv := &http.Server{
-		Addr:    "0.0.0.0:" + cfg.Port,
-		Handler: h,
-	}
+	controlSys := handler.NewControlSystem(opcClient)
+	ctx, cancel := context.WithCancel(context.Background())
+	for {
+		if tsServ.Start && !controlSys.IsActive && controlSys.IsDefault {
+			controlSys.Start(ctx)
+		}
 
-	slog.Info("Starting server on address " + srv.Addr)
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("listen and serve: %v", err)
+		if tsServ.Stop && controlSys.IsActive {
+			err := controlSys.Stop()
+			if err != nil {
+				continue
+			}
+
+			cancel()
+			ctx, cancel = context.WithCancel(context.Background())
+		}
+
+		if tsServ.BackToStart && !controlSys.IsActive && !controlSys.IsDefault {
+			controlSys.Default()
+		}
+
+		time.Sleep(time.Millisecond * 10)
 	}
 }

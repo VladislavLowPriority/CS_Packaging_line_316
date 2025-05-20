@@ -1,4 +1,4 @@
-package opc
+package api
 
 import (
 	"errors"
@@ -10,19 +10,38 @@ import (
 	"github.com/gopcua/opcua/ua"
 )
 
-const connString = "opc.tcp://10.160.160.61:4840"
-
-type MyClient struct {
+type OpcClient struct {
 	*opcua.Client
+	inputTagMap  map[string]bool
+	outputTagMap map[string]bool
 }
 
-func NewClient() *MyClient {
-	return &MyClient{
+func NewClient(connString string) *OpcClient {
+	client := &OpcClient{
 		opcua.NewClient(connString, opcua.SecurityMode(ua.MessageSecurityModeNone), opcua.DialTimeout(time.Second*5)),
+		make(map[string]bool),
+		make(map[string]bool),
 	}
+
+	client.inputTagMap["ns=4;i=9"] = client.GetNodeValue("ns=4;i=9")
+	client.inputTagMap["ns=4;i=10"] = client.GetNodeValue("ns=4;i=10")
+	client.inputTagMap["ns=4;i=24"] = client.GetNodeValue("ns=4;i=24")
+	client.inputTagMap["ns=4;i=25"] = client.GetNodeValue("ns=4;i=25")
+	client.inputTagMap["ns=4;i=26"] = client.GetNodeValue("ns=4;i=26")
+
+	client.inputTagMap["ns=4;i=3"] = client.GetNodeValue("ns=4;i=3")
+	client.inputTagMap["ns=4;i=4"] = client.GetNodeValue("ns=4;i=4")
+	client.inputTagMap["ns=4;i=6"] = client.GetNodeValue("ns=4;i=6")
+	client.inputTagMap["ns=4;i=7"] = client.GetNodeValue("ns=4;i=7")
+
+	client.inputTagMap["ns=4;i=31"] = client.GetNodeValue("ns=4;i=31")
+	client.inputTagMap["ns=4;i=30"] = client.GetNodeValue("ns=4;i=30")
+	client.inputTagMap["ns=4;i=32"] = client.GetNodeValue("ns=4;i=32")
+
+	return client
 }
 
-func (c *MyClient) GetNodeValue(nodeId string) bool {
+func (c *OpcClient) GetNodeValue(nodeId string) bool {
 	id, err := ua.ParseNodeID(nodeId)
 	if err != nil {
 		log.Fatal(err)
@@ -79,7 +98,7 @@ func (c *MyClient) GetNodeValue(nodeId string) bool {
 	return resp.Results[0].Value.Bool()
 }
 
-func (c *MyClient) WriteNodeValue(nodeId string, value bool) error {
+func (c *OpcClient) WriteNodeValue(nodeId string, value bool) error {
 	id, err := ua.ParseNodeID(nodeId)
 	if err != nil {
 		log.Fatal(err)
@@ -109,4 +128,11 @@ func (c *MyClient) WriteNodeValue(nodeId string, value bool) error {
 	}
 
 	return nil
+}
+
+// отправляет false на все теги для остановки установки
+func (c *OpcClient) SendAllFalses() {
+	for key := range c.outputTagMap {
+		c.WriteNodeValue(key, false)
+	}
 }

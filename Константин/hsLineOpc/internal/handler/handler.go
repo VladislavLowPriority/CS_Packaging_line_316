@@ -1,133 +1,100 @@
 package handler
 
 import (
-	"encoding/json"
+	"context"
+	"errors"
 	"hsLineOpc/api"
 	"hsLineOpc/internal/consts"
-	"hsLineOpc/internal/opc"
-	"log/slog"
-	"net/http"
+	"hsLineOpc/internal/galaction"
 	"time"
 )
 
-type MyServer struct {
-	opcClient *opc.MyClient
-	active    bool
-	inDefault bool
+// import (
+// 	"encoding/json"
+// 	"hsLineOpc/api"
+// 	"hsLineOpc/internal/consts"
+// 	"hsLineOpc/internal/opc"
+// 	"log/slog"
+// 	"net/http"
+// 	"time"
+// )
+
+type ControlSystem struct {
+	IsActive  bool
+	IsDefault bool
+
+	hsClient *api.OpcClient
 }
 
-type Config struct {
-	Port string
-}
+func NewControlSystem(hsClient *api.OpcClient) *ControlSystem {
+	return &ControlSystem{
+		IsActive:  false,
+		IsDefault: false,
 
-var _ api.ServerInterface = (*MyServer)(nil)
-
-func NewServer() *MyServer {
-	return &MyServer{
-		opcClient: opc.NewClient(),
-		active:    false,
-		inDefault: false,
+		hsClient: hsClient,
 	}
 }
 
-func (s *MyServer) makeGripperDefault() {
-	for !s.opcClient.GetNodeValue(consts.InputGripperPack) && !s.opcClient.GetNodeValue(consts.InputGripperStart) {
-		s.opcClient.WriteNodeValue(consts.OutputGripperLeft, true)
+func (s *ControlSystem) makeGripperDefault() {
+	for !s.hsClient.GetNodeValue(consts.InputGripperPack) && !s.hsClient.GetNodeValue(consts.InputGripperStart) {
+		s.hsClient.WriteNodeValue(consts.OutputGripperLeft, true)
 	}
-	s.opcClient.WriteNodeValue(consts.OutputGripperLeft, false)
+	s.hsClient.WriteNodeValue(consts.OutputGripperLeft, false)
 
-	for !s.opcClient.GetNodeValue(consts.InputGripperConveyor) && !s.opcClient.GetNodeValue(consts.InputGripperStart) {
-		s.opcClient.WriteNodeValue(consts.OutputGripperRight, true)
+	for !s.hsClient.GetNodeValue(consts.InputGripperConveyor) && !s.hsClient.GetNodeValue(consts.InputGripperStart) {
+		s.hsClient.WriteNodeValue(consts.OutputGripperRight, true)
 	}
-	s.opcClient.WriteNodeValue(consts.OutputGripperRight, false)
+	s.hsClient.WriteNodeValue(consts.OutputGripperRight, false)
 
 	// опустить шайбу
-	s.opcClient.WriteNodeValue(consts.OutputGripperOpen, true)
-	s.opcClient.WriteNodeValue(consts.OutputGripperUpDown, true)
+	s.hsClient.WriteNodeValue(consts.OutputGripperOpen, true)
+	s.hsClient.WriteNodeValue(consts.OutputGripperUpDown, true)
 	time.Sleep(time.Second * 3)
 
-	s.opcClient.WriteNodeValue(consts.OutputGripperOpen, false)
-	s.opcClient.WriteNodeValue(consts.OutputGripperUpDown, false)
+	s.hsClient.WriteNodeValue(consts.OutputGripperOpen, false)
+	s.hsClient.WriteNodeValue(consts.OutputGripperUpDown, false)
 	time.Sleep(time.Second * 3)
 }
 
 // Возврат установки в начальное положение
-// (POST /default)
-func (s *MyServer) PostDefault(w http.ResponseWriter, r *http.Request) {
-	if s.inDefault {
-		sendInfoResponse(w, nil, http.StatusOK)
+func (s *ControlSystem) Default() {
+	if s.IsDefault || s.IsActive {
 		return
 	}
 
 	// TODO: add check default pos
 	s.makeGripperDefault()
-	s.inDefault = true
-
-	sendInfoResponse(w, nil, http.StatusOK)
+	s.IsDefault = true
 }
 
 // Запуск установки
-// (POST /start)
-func (s *MyServer) PostStart(w http.ResponseWriter, r *http.Request) {
-	if !s.inDefault {
-		sendErrorResponse(w, "установка не в начальном положении", http.StatusForbidden)
+func (s *ControlSystem) Start(ctx context.Context) {
+	if !s.IsDefault {
 		return
 	}
 
-	if s.active {
-		sendInfoResponse(w, nil, http.StatusOK)
+	if s.IsActive {
 		return
 	}
 
-	s.active = true
-	s.inDefault = false
+	s.IsActive = true
+	s.IsDefault = false
 
-	go func() {
-		for s.active {
-			// TODO: galaction start
-			slog.Info("working...")
-			time.Sleep(time.Second)
+	go func(ctx context.Context) {
+		for s.IsActive {
+			galaction.EntryStartHs(ctx, s.hsClient)
 		}
-	}()
-
-	sendInfoResponse(w, nil, http.StatusOK)
+	}(ctx)
 }
 
 // Остановка установки
-// (POST /stop)
-func (s *MyServer) PostStop(w http.ResponseWriter, r *http.Request) {
-	if !s.active {
-		sendInfoResponse(w, nil, http.StatusOK)
-		return
+func (s *ControlSystem) Stop() error {
+	if !s.IsActive {
+		return errors.New("system alredy stopped")
 	}
 
-	s.active = false
+	s.hsClient.SendAllFalses()
+	s.IsActive = false
 
-	sendInfoResponse(w, nil, http.StatusOK)
-}
-
-func sendErrorResponse(w http.ResponseWriter, errMsg string, status int) {
-	resp, _ := json.Marshal(api.Error{Message: errMsg})
-	slog.Error(errMsg)
-
-	w.WriteHeader(status)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp)
-}
-
-func sendInfoResponse(w http.ResponseWriter, object any, status int) {
-	if object != nil {
-		resp, err := json.Marshal(object)
-		if err != nil {
-			sendErrorResponse(w, "failed to form response", http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(status)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(resp)
-		return
-	}
-
-	w.WriteHeader(status)
+	return nil
 }
