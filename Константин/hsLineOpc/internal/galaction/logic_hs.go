@@ -3,6 +3,7 @@ package galaction
 import (
 	"context"
 	"fmt"
+	"hsLineOpc/api"
 
 	"time"
 
@@ -10,7 +11,7 @@ import (
 )
 
 type HS struct {
-	client *OPCClient
+	client *api.OpcClient
 
 	// 输入节点
 	gripperStartSensor    *ua.NodeID
@@ -29,7 +30,7 @@ type HS struct {
 	fixBoxUpperSide     *ua.NodeID
 }
 
-func NewHS(client *OPCClient) *HS {
+func NewHS(client *api.OpcClient) *HS {
 	return &HS{
 		client:                client,
 		gripperStartSensor:    MustParseNodeID("ns=4;i=31"),

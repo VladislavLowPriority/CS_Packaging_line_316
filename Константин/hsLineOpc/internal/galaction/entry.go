@@ -10,20 +10,11 @@ import (
 )
 
 func EntryStartHs(ctx context.Context, hsClient *api.OpcClient) {
-	// 初始化OPC客户端
-	client := OPCClient(*hsClient)
-	defer client.Close(context.Background())
-
-	// 检查连接状态
-	if err := client.Connect(ctx); err != nil {
-		log.Fatal("连接到服务器失败: ", err)
-	}
-
 	// 初始化各模块
-	hs := NewHS(&client)
-	packs := NewPackS(&client)
-	procs := NewProcS(&client)
-	ss := NewSS(&client)
+	hs := NewHS(hsClient)
+	packs := NewPackS(hsClient)
+	procs := NewProcS(hsClient)
+	ss := NewSS(hsClient)
 
 	// 主控制流程
 	if err := controlLoop(ctx, hs, procs, packs, ss); err != nil {

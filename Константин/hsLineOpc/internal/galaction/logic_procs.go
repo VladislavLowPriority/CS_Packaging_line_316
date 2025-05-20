@@ -3,6 +3,7 @@ package galaction
 
 import (
 	"context"
+	"hsLineOpc/api"
 	"log"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 )
 
 type ProcS struct {
-	client *OPCClient
+	client *api.OpcClient
 
 	// 节点定义
 	RedTag         *ua.NodeID
@@ -29,7 +30,7 @@ type ProcS struct {
 	counter int
 }
 
-func NewProcS(client *OPCClient) *ProcS {
+func NewProcS(client *api.OpcClient) *ProcS {
 	return &ProcS{
 		client:         client,
 		RedTag:         MustParseNodeID("ns=4;i=24"),

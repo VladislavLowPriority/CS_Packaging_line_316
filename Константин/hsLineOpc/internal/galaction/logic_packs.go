@@ -3,20 +3,21 @@ package galaction
 
 import (
 	"context"
+	"hsLineOpc/api"
 	"time"
 
 	"github.com/gopcua/opcua/ua"
 )
 
 type PackS struct {
-	client *OPCClient
+	client *api.OpcClient
 
 	FixBoxTongue    *ua.NodeID
 	FixBoxUpperSide *ua.NodeID
 	PackBox         *ua.NodeID
 }
 
-func NewPackS(client *OPCClient) *PackS {
+func NewPackS(client *api.OpcClient) *PackS {
 	return &PackS{
 		client:          client,
 		FixBoxTongue:    MustParseNodeID("ns=4;i=45"),

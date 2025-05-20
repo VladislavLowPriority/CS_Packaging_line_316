@@ -2,8 +2,10 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"time"
 
 	"github.com/gopcua/opcua"
@@ -95,6 +97,8 @@ func (c *OpcClient) GetNodeValue(nodeId string) bool {
 		log.Fatalf("Status not OK: %v", resp.Results[0].Status)
 	}
 
+	c.inputTagMap[nodeId] = resp.Results[0].Value.Bool()
+
 	return resp.Results[0].Value.Bool()
 }
 
@@ -127,6 +131,8 @@ func (c *OpcClient) WriteNodeValue(nodeId string, value bool) error {
 		log.Fatalf("Write failed: %s", err)
 	}
 
+	c.outputTagMap[nodeId] = value
+
 	return nil
 }
 
@@ -135,4 +141,44 @@ func (c *OpcClient) SendAllFalses() {
 	for key := range c.outputTagMap {
 		c.WriteNodeValue(key, false)
 	}
+}
+
+func (c *OpcClient) WriteBools(nodes []*ua.NodeID, values []bool) error {
+	if len(nodes) != len(values) {
+		return fmt.Errorf("количество узлов и значений должно быть одинаковым")
+	}
+
+	start := time.Now()
+	for i, node := range nodes {
+		// writeValues[i] = &ua.WriteValue{
+		// 	NodeID:      node,
+		// 	AttributeID: ua.AttributeIDValue,
+		// 	Value: &ua.DataValue{
+		// 		EncodingMask: ua.DataValueValue,
+		// 		Value:        ua.MustVariant(values[i]),
+		// 	},
+		// }
+
+		c.WriteNodeValue(node.StringID(), values[i])
+	}
+
+	// _, err := c.Client.Write(&ua.WriteRequest{
+	// 	NodesToWrite: writeValues,
+	// })
+
+	fmt.Printf("Write %d values - %d ms\n", len(nodes), time.Since(start).Milliseconds())
+
+	return nil
+}
+
+func (c *OpcClient) ReadBools(nodes []*ua.NodeID) ([]bool, error) {
+	start := time.Now()
+	results := make([]bool, 0, len(nodes))
+	for _, node := range nodes {
+		results = append(results, c.GetNodeValue(node.StringID()))
+	}
+
+	slog.Info(fmt.Sprintf("Read %d values - %d ms\n", len(nodes), time.Since(start).Milliseconds()))
+
+	return results, nil
 }

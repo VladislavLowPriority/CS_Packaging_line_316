@@ -3,13 +3,14 @@ package galaction
 
 import (
 	"context"
+	"hsLineOpc/api"
 	"time"
 
 	"github.com/gopcua/opcua/ua"
 )
 
 type SS struct {
-	client *OPCClient
+	client *api.OpcClient
 
 	// 节点定义
 	BoxOnConveyorTag  *ua.NodeID
@@ -23,7 +24,7 @@ type SS struct {
 	PushRed           *ua.NodeID
 }
 
-func NewSS(client *OPCClient) *SS {
+func NewSS(client *api.OpcClient) *SS {
 	return &SS{
 		client:            client,
 		BoxOnConveyorTag:  MustParseNodeID("ns=4;i=9"),

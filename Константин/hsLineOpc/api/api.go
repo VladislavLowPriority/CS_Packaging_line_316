@@ -47,6 +47,11 @@ func (c *TsClient) subscribeSendTsTags() {
 				tsKey := key[:3] + "1" + key[4:]
 				c.client.WriteNodeValue(tsKey, val)
 			}
+
+			for key, val := range c.client.outputTagMap {
+				tsKey := key[:3] + "1" + key[4:]
+				c.client.WriteNodeValue(tsKey, val)
+			}
 			c.mu.RUnlock()
 
 			time.Sleep(time.Millisecond * 100)
