@@ -17,7 +17,7 @@ type TsClient struct {
 	Stop        bool
 	BackToStart bool
 
-	client *OpcClient
+	Client *OpcClient
 	mu     sync.RWMutex
 }
 
@@ -29,7 +29,7 @@ func NewTsClient() *TsClient {
 		Stop:        false,
 		BackToStart: false,
 
-		client: NewClient(tsConnString),
+		Client: NewClient(tsConnString),
 		mu:     sync.RWMutex{},
 	}
 }
@@ -43,14 +43,14 @@ func (c *TsClient) subscribeSendTsTags() {
 	go func() {
 		for {
 			c.mu.RLock()
-			for key, val := range c.client.inputTagMap {
+			for key, val := range c.Client.inputTagMap {
 				tsKey := key[:3] + "1" + key[4:]
-				c.client.WriteNodeValue(tsKey, val)
+				c.Client.WriteNodeValue(tsKey, val)
 			}
 
-			for key, val := range c.client.outputTagMap {
+			for key, val := range c.Client.outputTagMap {
 				tsKey := key[:3] + "1" + key[4:]
-				c.client.WriteNodeValue(tsKey, val)
+				c.Client.WriteNodeValue(tsKey, val)
 			}
 			c.mu.RUnlock()
 
@@ -63,9 +63,9 @@ func (c *TsClient) subscribeReadTsTags() {
 	go func() {
 		for {
 			c.mu.Lock()
-			c.Start = c.client.GetNodeValue(consts.TsStartHs)
-			c.Stop = c.client.GetNodeValue(consts.TsStopHs)
-			c.BackToStart = c.client.GetNodeValue(consts.TsBackToStart)
+			c.Start = c.Client.GetNodeValue(consts.TsStartHs)
+			c.Stop = c.Client.GetNodeValue(consts.TsStopHs)
+			c.BackToStart = c.Client.GetNodeValue(consts.TsBackToStart)
 			c.mu.Unlock()
 
 			time.Sleep(time.Millisecond * 100)
