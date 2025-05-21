@@ -38,7 +38,7 @@ Kubernetes
 Помимо этого мы изучали [метод внедрения СУ в Kubernetes](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Reports/%D0%9E%D1%82%D1%87%D0%B5%D1%82%20%D0%BF%D0%BE%20kubernetes%20%D0%B8%20%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B%20%D0%BD%D0%B0%20python%20(%D0%BF%D0%BE%D0%B4%D1%85%D0%BE%D0%B4%D0%B8%D1%82%20%D0%B4%D0%BB%D1%8F%20%D0%BB%D1%8E%D0%B1%D0%BE%D0%B3%D0%BE%20%D0%AF%D0%9F).pdf)  
 ##
 После глубокого анализа протоколов связи, мы выяснили что EtherNetIP совместим с нашим оборудованием и удовлетворяет критерию скорости передачи данных.  
-В веду сложности задачи, было решено протестировать EtherNetIP на двух контроллерах Siemens S7 1200, 1-ый PLC настроен как адаптер, 2-ой PLC в качестве сканнера, в качестве документации мы использовали следующие документы:
+Ввиду сложности задачи, было решено протестировать EtherNetIP на двух контроллерах Siemens S7 1200, 1-ый PLC настроен как адаптер, 2-ой PLC в качестве сканнера, в качестве документации мы использовали следующие документы:
 [адаптер](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782315_EtherNetIP_Adapter_DOC_V10_en-1.pdf)
 и  
 [сканнер](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782314_EtherNetIP_Scanner_DOC_V1_3_en%20(1).pdf)  
