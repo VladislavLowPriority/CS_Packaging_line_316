@@ -11,37 +11,6 @@ import (
 	"time"
 )
 
-// func main() {
-// 	ctx, cancel := context.WithCancel(context.Background())
-// 	defer cancel()
-
-// 	// 处理系统信号
-// 	sigCh := make(chan os.Signal, 1)
-// 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-// 	go func() {
-// 		<-sigCh
-// 		cancel()
-// 	}()
-
-// 	// 初始化OPC客户端
-// 	client, err := NewOPCClient("opc.tcp://10.160.160.61:4840")
-// 	if err != nil {
-// 		log.Fatal("OPC连接失败: ", err)
-// 	}
-// 	defer client.Close(context.Background())
-
-// 	// 初始化各模块
-// 	hs := NewHS(client)
-// 	packs := NewPackS(client)
-// 	procs := NewProcS(client)
-// 	ss := NewSS(client)
-
-// 	// 主控制流程
-// 	if err := controlLoop(ctx, hs, procs, packs, ss); err != nil {
-// 		log.Fatal("控制流程错误: ", err)
-// 	}
-// }
-
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
