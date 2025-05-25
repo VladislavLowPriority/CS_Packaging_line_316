@@ -30,19 +30,20 @@
 ![изображение](https://github.com/n0th1ngs89/HS_Line_316_I-O/assets/146949002/05848d01-be59-402f-ab1c-b9a10d6a265b)
 
 ## Ход работы:
+## Протокол EtherNet/IP
 Была написана тестовая программа СУ на языке Golang, используюящая протокол связи OPCua.  
 В ходе тестирования мы выяснили, скорости протокола связи OPCua недостаточно для корректной работы механизма гриппера.  
 Мы получили такие [результаты](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Reports/%D0%9E%D1%82%D1%87%D0%B5%D1%82%20%D0%BF%D0%BE%20OPC%20UA%20-%20%D0%BC%D0%B5%D0%B4%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B9.pdf)  
 Следующим шагом было выбор наиболее подхоящего протокола связи для достижения минимальных задержек и совместимости с нашим оборудованием:  [Таблица](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Reports/%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%BE%D1%82%D0%BE%D0%BA%D0%BE%D0%BB%D0%BE%D0%B2.pdf).  
 Помимо этого мы изучали [метод внедрения СУ в Kubernetes](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Reports/%D0%9E%D1%82%D1%87%D0%B5%D1%82%20%D0%BF%D0%BE%20kubernetes%20%D0%B8%20%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B%20%D0%BD%D0%B0%20python%20(%D0%BF%D0%BE%D0%B4%D1%85%D0%BE%D0%B4%D0%B8%D1%82%20%D0%B4%D0%BB%D1%8F%20%D0%BB%D1%8E%D0%B1%D0%BE%D0%B3%D0%BE%20%D0%AF%D0%9F).pdf).  
-###
+####
 После глубокого анализа протоколов связи, мы выяснили что EtherNetIP совместим с нашим оборудованием и удовлетворяет критерию скорости передачи данных.  
 Ввиду сложности задачи, было решено протестировать EtherNetIP на двух контроллерах Siemens S7 1200, 1-ый PLC настроен как адаптер, 2-ой PLC в качестве сканнера, в качестве документации мы использовали следующие документы:
 [Adapter](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782315_EtherNetIP_Adapter_DOC_V10_en-1.pdf) и [Scanner](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782314_EtherNetIP_Scanner_DOC_V1_3_en%20(1).pdf)  
-###
+####
 [Проект TIA PORTAL V16](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/eip.zap16) тестирует задержки передачи данных между двумя PLC по EtherNetIP, в ходе тестирования задержки 5-20мс.  
 
-## СУ Код
+## Код СУ
 Хотя протокол OPCua имеет некоторые проблемы при зажиме приспособления, в реальном процессе, поскольку протокол EtherNet/ip всегда имел некоторые проблемы, которые не могут быть решены, мы решили использовать протокол OPCua и язык Golang для завершения написания СУ.
 
 Установка представляет собой набор нескольких объектов, которые выполняют свою задачу в процессе работы линии: вращающейся платформы, гриппера, упаковочной линии, сортировочной линии. 
@@ -104,12 +105,13 @@
  - Сервер клиентских подключений OPCua
  - Операции чтения и записи клиента OPCua
 
-##
+## Реализация сервера OPCua в контейнере Kubernetes
 В рамках стандарта Industry 4.0 и будущей модернизации программы PLC, было принято решение о реализации OPCua сервера непосредсвенно в контейнере Kubernetes. Для этого были созданы программы:
 
-[Программа №1.](https://github.com/VladislavLowPriority/CS_Packaging_line_316/tree/main/%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D1%81%D0%BB%D0%B0%D0%B2/OPCkuberAndGUI/OPCkuber) Реализует OPCua сервер в Kubernetes и на данный момент синхронизирует теги в сервере с тегами на плк. Также были реализованы дополнительные теги (старт/стоп/возвращение в исходное состояние) для интерфейсного доступа к СУ с SCADA или веб-приложения.
+ - [Программа №1.](https://github.com/VladislavLowPriority/CS_Packaging_line_316/tree/main/%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D1%81%D0%BB%D0%B0%D0%B2/OPCkuberAndGUI/OPCkuber) Реализует OPCua сервер в Kubernetes и на данный момент синхронизирует теги в сервере с тегами на плк. Также были реализованы дополнительные теги (старт/стоп/возвращение в исходное состояние) для интерфейсного доступа к СУ с SCADA или веб-приложения.
 
-[Программа №2.](https://github.com/VladislavLowPriority/CS_Packaging_line_316/tree/main/%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D1%81%D0%BB%D0%B0%D0%B2/OPCkuberAndGUI/UI_hs) Веб-интерфейс для взаимодействия с тегами старт/стоп/возвращение в исходное состояние (Клиент OPCua отправляет новое значение тегов в OPCua сервер в Kubernetes). Программа позволяет взаимодействовать с СУ, развернутой в Kubernetes.
+ - [Программа №2.](https://github.com/VladislavLowPriority/CS_Packaging_line_316/tree/main/%D0%92%D0%BB%D0%B0%D0%B4%D0%B8%D1%81%D0%BB%D0%B0%D0%B2/OPCkuberAndGUI/UI_hs) Веб-интерфейс для взаимодействия с тегами старт/стоп/возвращение в исходное состояние (Клиент OPCua отправляет новое значение тегов в OPCua сервер в Kubernetes). Программа позволяет взаимодействовать с СУ, развернутой в Kubernetes.
+
 ## Возникшие сложности:
 #### Тестирование библиотек для Ethernet/IP
 В ходе тестирования библиотек была выявлена проблема, что при использовании любой из них, мы не можем отправить корректный запрос в плк с указанием прочтения нужной ячейки памяти. При этом ПЛК, настроенный как EthernetIP Adapter, видится в сети как устройство EthernetIP. В мануале к библиотеке Siemens ENIP Adapter указывается конкретные Class = 0x04, Instance = 101 (Input), 102 (Output), 104 (Configuration), где должна храниться и откуда должна приниматься информация в соответствующий объект, созданный в ПЛК. Однако, при формировании любого запроса, кроме Class = 0x06, Instance = 1, который возвращает конфигурацию ПЛК (серийный номер, и тд..), ответа с ПЛК не поступает. Пример ответа: Object does not exist. При этом на сам ПЛК в поле запроса приходят корректные значения соответсвтующих атрибутов.  
