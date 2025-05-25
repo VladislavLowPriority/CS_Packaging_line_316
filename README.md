@@ -54,7 +54,7 @@
   - Перемещение захвата на крайнюю левую позицию над магазином фишек (там, где будет выдаваться заготовка). Захват опускается, захватывает фишку и переносит её на станцию сверления.
   - Захват забирает обработанное изделие и переносит его на станцию упаковки в центральную позицию.
   - Захват переносит коробку в крайнее правое положение и опускает коробку на конвейер.
-  - [Код станция перемещения](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_hs.go)
+[Код станция перемещения](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_hs.go)
 
 ### 2. Станция сверления
 ![photo_2024-05-27_18-44-32](https://github.com/Spynch/HS_line316/assets/110130006/494b93d8-83f6-4c23-a437-ab748e7b1125)
@@ -64,14 +64,14 @@
   - Далее идет оборот стола ещё на один такт, чтобы попасть к модулю сверления. 
   - Если заготовка является перевернутой, то модуль сверления опускается.
   - После обработки стол поворачивается к изначальной позиции, обработка детали закончена. 
-  - [Код станция сверления](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_procs.go)
+[Код станция сверления](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_procs.go)
 
 ### 3. Станция упаковк
 ![photo_2024-05-27_18-44-46](https://github.com/Spynch/HS_line316/assets/110130006/7fd1a6e3-e4ea-4f62-ad4f-d0270033e25f)
 
 Его функции:
   - Коробки поступают на позицию подготовки и открываются, после чего захват захватывает обработанный продукт и переносит его на центральную упаковочную станцию. Затем положите его в коробку и упакуйте.
-  - [Код станция упаковк](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_packs.go)
+[Код станция упаковк](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_packs.go)
 
 ### 4. Станция распределения заготовок
  ![photo_2024-05-27_18-44-44](https://github.com/Spynch/HS_line316/assets/110130006/1e70fb35-7167-40b7-9e6b-237a5c021b98)
@@ -79,8 +79,25 @@
 Его функции:
   - В зависимости от определенного ранее на станции обработки цвета изделия, запускается соответствующий отсекатель.
   - коробка c заготовкой идёт в нужный накопитель. 
-  - [Код станция распределения заготовок](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_ss.go)
+[Код станция распределения заготовок](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_ss.go)
 
+### 5. Имитируемый технологический процесс
+ - Шаг 1: Размещение объекта на карусели
+ - Шаг 2: Запуск процесса обработки
+ - Шаг 3: Перемещение к упаковке
+ - Шаг 4: Запуск упаковки
+ - Шаг 5: Перемещение к сортировке
+ - Шаг 6: Запуск сортировки
+ - Шаг 7: Возврат в исходное положение
+
+[Код Основной процесс(main)](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/main.go)
+
+### 6. Создание, подключение, чтение и запись клиентов OPCua
+[Код OPCua](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/opc_ua_operations.go)
+В эту программу входит:
+ - Создание клиента OPCua
+ - Сервер клиентских подключений OPCua
+ - Операции чтения и записи клиента OPCua
 
 ##
 В рамках стандарта Industry 4.0 и будущей модернизации программы PLC, было принято решение о реализации OPCua сервера непосредсвенно в контейнере Kubernetes. Для этого были созданы программы:
