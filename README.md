@@ -14,12 +14,12 @@
 Обеспечить сокращение задержек передачи управляющих сигналов между установкой упаковочной станции (СУ 316) и системы управления, развернутой на сервере, путем поиска и интегрирования протокола реального времени (RT). Также необходимо определить подходящий язык программирования и адаптировать под него логику СУ, подготовить интерфейс для реализации функционала старта/стопа и развернуть СУ в Kubernetes.
 
 ## Используемое ПО
-Siemens TIA Portal V16 / SIMATIC STEP 7 incl. Safety and WinCC V16    
-UaExpert  
-VisualCode  
-EnIPExploler  
-Docker Desktop  
-Kubernetes  
+ - Siemens TIA Portal V16 / SIMATIC STEP 7 incl. Safety and WinCC V16    
+ - UaExpert  
+ - VisualCode  
+ - EnIPExploler  
+ - Docker Desktop  
+ - Kubernetes  
 
 
 ## Ссылка на репозиторий (2024 год)
