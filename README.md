@@ -36,14 +36,26 @@
 Следующим шагом было выбор наиболее подхоящего протокола связи для достижения минимальных задержек и совместимости с нашим оборудованием:  
 [Таблица](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Reports/%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%BE%D1%82%D0%BE%D0%BA%D0%BE%D0%BB%D0%BE%D0%B2.pdf).  
 Помимо этого мы изучали [метод внедрения СУ в Kubernetes](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Reports/%D0%9E%D1%82%D1%87%D0%B5%D1%82%20%D0%BF%D0%BE%20kubernetes%20%D0%B8%20%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B%20%D0%BD%D0%B0%20python%20(%D0%BF%D0%BE%D0%B4%D1%85%D0%BE%D0%B4%D0%B8%D1%82%20%D0%B4%D0%BB%D1%8F%20%D0%BB%D1%8E%D0%B1%D0%BE%D0%B3%D0%BE%20%D0%AF%D0%9F).pdf).  
-##
+###
 После глубокого анализа протоколов связи, мы выяснили что EtherNetIP совместим с нашим оборудованием и удовлетворяет критерию скорости передачи данных.  
 Ввиду сложности задачи, было решено протестировать EtherNetIP на двух контроллерах Siemens S7 1200, 1-ый PLC настроен как адаптер, 2-ой PLC в качестве сканнера, в качестве документации мы использовали следующие документы:
-[Adapter](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782315_EtherNetIP_Adapter_DOC_V10_en-1.pdf)
-и  
-[Scanner](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782314_EtherNetIP_Scanner_DOC_V1_3_en%20(1).pdf)  
-##
+[Adapter](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782315_EtherNetIP_Adapter_DOC_V10_en-1.pdf) и [Scanner](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/Ethernet.IP/%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B0%D1%8F%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F/109782314_EtherNetIP_Scanner_DOC_V1_3_en%20(1).pdf)  
+###
 [Проект TIA PORTAL V16](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/eip.zap16) тестирует задержки передачи данных между двумя PLC по EtherNetIP, в ходе тестирования задержки 5-20мс.  
+
+## СУ Код
+Хотя протокол OPCua имеет некоторые проблемы при зажиме приспособления, в реальном процессе, поскольку протокол EtherNet/ip всегда имел некоторые проблемы, которые не могут быть решены, мы решили использовать протокол OPCua и язык Golang для завершения написания СУ.
+
+Установка представляет собой набор нескольких объектов, которые выполняют свою задачу в процессе работы линии: вращающейся платформы, гриппера, упаковочной линии, сортировочной линии. 
+
+### 1. Станция перемещения
+ ![photo_2024-05-27_18-44-42](https://github.com/Spynch/HS_line316/assets/110130006/954335ad-1ccb-4438-a3f8-2222028dbce3)
+ 
+Его функции:
+  - Перемещение захвата на крайнюю левую позицию над магазином фишек (там, где будет выдаваться заготовка). Захват опускается, захватывает фишку и переносит её на станцию сверления.
+  - Захват забирает обработанное изделие и переносит его на станцию упаковки в центральную позицию.
+  - Захват переносит коробку в крайнее правое положение и опускает коробку на конвейер.
+  - [Код](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/%D0%93%D0%B0%D0%BB%D0%B0%D0%BA%D1%82%D0%B8%D0%BE%D0%BD/GO316_ru/logic_hs.go)
 ##
 В рамках стандарта Industry 4.0 и будущей модернизации программы PLC, было принято решение о реализации OPCua сервера непосредсвенно в контейнере Kubernetes. Для этого были созданы программы:
 
