@@ -22,30 +22,31 @@ func main() {
 		slog.Error(fmt.Sprintf(".env file load error: %s", err.Error()))
 	}
 
-	tsServ := api.NewTsClient()
-
+	tsServ := api.NewTsClient(os.Getenv("TS_SERVER_CONN"))
 	err = tsServ.Client.Connect(context.Background())
 	if err != nil {
 		log.Fatalf("TS server connect error: %s", err.Error())
 	}
 	defer tsServ.Client.Close()
+	slog.Info("TS client connected")
 
 	tsServ.SubscribeTs()
 	slog.Info("TS server tags subscribed")
 
-	opcConn := os.Getenv("OPC_SERVER_IP") + ":" + os.Getenv("OPC_SERVER_PORT")
-	opcClient := api.NewClient(opcConn)
-
+	opcClient := api.NewClient(os.Getenv("OPC_SERVER_CONN"))
 	err = opcClient.Connect(context.Background())
 	if err != nil {
 		log.Fatalf("CS server connect error: %s", err.Error())
 	}
 	defer opcClient.Close()
+	slog.Info("HS client connected")
 
 	controlSys := handler.NewControlSystem(opcClient)
 	ctx, cancel := context.WithCancel(context.Background())
+	slog.Info("listening for TS server tags")
 	for {
 		if tsServ.Start && !controlSys.IsActive && controlSys.IsDefault {
+			slog.Info("Starting HS line")
 			controlSys.Start(ctx)
 		}
 
@@ -56,11 +57,13 @@ func main() {
 				continue
 			}
 
+			slog.Info("Stopping HS line")
 			cancel()
 			ctx, cancel = context.WithCancel(context.Background())
 		}
 
 		if tsServ.BackToStart && !controlSys.IsActive && !controlSys.IsDefault {
+			slog.Info("Moving to default HS line")
 			controlSys.Default()
 		}
 

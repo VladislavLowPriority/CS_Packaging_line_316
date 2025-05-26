@@ -2,7 +2,6 @@ package api
 
 import (
 	"hsLineOpc/internal/consts"
-	"os"
 	"sync"
 	"time"
 )
@@ -21,9 +20,7 @@ type TsClient struct {
 	mu     sync.RWMutex
 }
 
-func NewTsClient() *TsClient {
-	tsConnString := os.Getenv("TS_SERVER_IP") + ":" + os.Getenv("TS_SERVER_PORT")
-
+func NewTsClient(tsConnString string) *TsClient {
 	return &TsClient{
 		Start:       false,
 		Stop:        false,

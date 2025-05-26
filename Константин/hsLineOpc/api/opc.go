@@ -25,20 +25,20 @@ func NewClient(connString string) *OpcClient {
 		make(map[string]bool),
 	}
 
-	client.inputTagMap["ns=4;i=9"] = client.GetNodeValue("ns=4;i=9")
-	client.inputTagMap["ns=4;i=10"] = client.GetNodeValue("ns=4;i=10")
-	client.inputTagMap["ns=4;i=24"] = client.GetNodeValue("ns=4;i=24")
-	client.inputTagMap["ns=4;i=25"] = client.GetNodeValue("ns=4;i=25")
-	client.inputTagMap["ns=4;i=26"] = client.GetNodeValue("ns=4;i=26")
+	// client.inputTagMap["ns=4;i=9"] = client.GetNodeValue("ns=4;i=9")
+	// client.inputTagMap["ns=4;i=10"] = client.GetNodeValue("ns=4;i=10")
+	// client.inputTagMap["ns=4;i=24"] = client.GetNodeValue("ns=4;i=24")
+	// client.inputTagMap["ns=4;i=25"] = client.GetNodeValue("ns=4;i=25")
+	// client.inputTagMap["ns=4;i=26"] = client.GetNodeValue("ns=4;i=26")
 
-	client.inputTagMap["ns=4;i=3"] = client.GetNodeValue("ns=4;i=3")
-	client.inputTagMap["ns=4;i=4"] = client.GetNodeValue("ns=4;i=4")
-	client.inputTagMap["ns=4;i=6"] = client.GetNodeValue("ns=4;i=6")
-	client.inputTagMap["ns=4;i=7"] = client.GetNodeValue("ns=4;i=7")
+	// client.inputTagMap["ns=4;i=3"] = client.GetNodeValue("ns=4;i=3")
+	// client.inputTagMap["ns=4;i=4"] = client.GetNodeValue("ns=4;i=4")
+	// client.inputTagMap["ns=4;i=6"] = client.GetNodeValue("ns=4;i=6")
+	// client.inputTagMap["ns=4;i=7"] = client.GetNodeValue("ns=4;i=7")
 
-	client.inputTagMap["ns=4;i=31"] = client.GetNodeValue("ns=4;i=31")
-	client.inputTagMap["ns=4;i=30"] = client.GetNodeValue("ns=4;i=30")
-	client.inputTagMap["ns=4;i=32"] = client.GetNodeValue("ns=4;i=32")
+	// client.inputTagMap["ns=4;i=31"] = client.GetNodeValue("ns=4;i=31")
+	// client.inputTagMap["ns=4;i=30"] = client.GetNodeValue("ns=4;i=30")
+	// client.inputTagMap["ns=4;i=32"] = client.GetNodeValue("ns=4;i=32")
 
 	return client
 }
