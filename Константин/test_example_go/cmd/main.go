@@ -24,9 +24,9 @@ func main() {
 	// uncomment on usage
 	//moveGripperToStart(c, false)
 
-	for i := 0; i < 10; i++ {
-		testGripperSkip(client)
-	}
+	// for i := 0; i < 10; i++ {
+	// 	testGripperSkip(client)
+	// }
 }
 
 func testGripperSkip(c *opc.MyClient) {
