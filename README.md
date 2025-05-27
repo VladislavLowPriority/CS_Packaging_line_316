@@ -171,6 +171,68 @@ npm install  # Установит все зависимости из package.jso
 #### Аппаратные проблемы, возникшие во время отладки программы
 В процессе отладки мы обнаружили, что конвейерная лента, упаковочный стол и некоторые другие части компонентов не могут работать должным образом, поэтому мы еще не завершили отладку программ, связанных с конвейерной лентой и упаковочным столом.
 
+
+#### Список устройств которые работают не норм
+<table>
+  <tr>
+    <th>устройства которые не работают норм</th>
+    <th>тэги</th>
+  </tr>
+  <tr>
+    <td>Станция сверления</td>
+    <td>processing_output_2_drill_down</td>
+  </tr>
+  <tr>
+    <td>Станция сверления</td>
+    <td>processing_output_3_drill_up</td>
+  </tr>
+  <tr>
+    <td>Станция перемещения</td>
+    <td>handling_output_5_gripper_to_down</td>
+  </tr>
+  <tr>
+    <td>Станция перемещения</td>
+    <td>handling_output_6_gripper_to_open</td>
+  </tr>
+  <tr>
+    <td>Станция перемещения</td>
+    <td>handling_output_7_push_workpiece</td>
+  </tr>
+  <tr>
+    <td>Станция упаковки</td>
+    <td>packing_output_4_push_box</td>
+  </tr>
+  <tr>
+    <td>Станция упаковки</td>
+    <td>packing_output_5_fix_box_upper_side</td>
+  </tr>
+  <tr>
+    <td>Станция упаковки</td>
+    <td>packing_output_6_fix_box_tongue</td>
+  </tr>
+  <tr>
+    <td>Станция распределения заготовок</td>
+    <td>sorting_output_2_push_silver_workpiece</td>
+  </tr>
+  <tr>
+    <td>Станция распределения заготовок</td>
+    <td>sorting_output_3_push_red_workpiece</td>
+  </tr>
+  <tr>
+    <td>Станция распределения заготовок</td>
+    <td>sorting_output_1_move_conveyor_left</td>
+  </tr>
+  <tr>
+    <td>Станция распределения заготовок</td>
+    <td>sorting_output_0_move_conveyor_right</td>
+  </tr>
+</table>
+
+
+
+
+
+
 ## Таблица входных и выходных тэгов
 
 ### Processing station PLC
