@@ -1,14 +1,14 @@
 # Упаковочная линия 316
-📦     
-├── 📂 Documentation  
-├── 📂 Projects  
-│   ├── 📂 CS  
-│   ├── 📂 EnIPExplorer  
-│   ├── 📂 OPCKuber+GUI  
-│   │   ├── 📂 OPCkuber  
-│   │   └── 📂 UI_hs  
-│   └── 📂 TiaPortal_EIP_Project  
-└── 📜 README.md  
+ 📦     
+ ├── 📂 Documentation  // Документация
+ ├── 📂 Projects  // Проекты
+ │   ├── 📂 CS  // Система управления (Golang)
+ │   ├── 📂 EnIPExplorer  // Программа для поиска устройств Ethernet/IP в сети
+ │   ├── 📂 OPCKuber+GUI  
+ │   │   ├── 📂 OPCkuber  // Программа для запуска OPC UA сервера в Kubernetes
+ │   │   └── 📂 UI_hs  // Программа реализации минимального пользовательского интерфейса для взаимодействия с СУ
+ │   └── 📂 TiaPortal_EIP_Project  // Проект Tia Portal v16 Ethernet/IP для двух контроллеров S7-1200 
+ └── 📜 README.md  
 # Документация проекта
 ## Авторы
 Качалов Владислав  
