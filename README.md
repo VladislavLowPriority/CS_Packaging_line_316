@@ -1,5 +1,14 @@
 # Упаковочная линия 316
-
+📦 
+├── 📂 Documentation
+├── 📂 Projects
+│   ├── 📂 CS
+│   ├── 📂 EnIPExplorer
+│   ├── 📂 OPCKuber+GUI
+│   │   ├── 📂 OPCkuber
+│   │   └── 📂 UI_hs
+│   └── 📂 TiaPortal_EIP_Project
+└── 📜 README.md
 # Документация проекта
 ## Авторы
 Качалов Владислав  
