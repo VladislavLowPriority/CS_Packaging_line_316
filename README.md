@@ -69,7 +69,7 @@
   - Захват забирает обработанное изделие и переносит его на станцию упаковки в центральную позицию.
   - Захват переносит коробку в крайнее правое положение и опускает коробку на конвейер.
 
-[Код станции перемещения](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/galaction/logic_hs.go)
+[Код станции перемещения](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/Modules/logic_hs.go)
 
 ### 2. Станция сверления
 ![photo_2024-05-27_18-44-32](https://github.com/Spynch/HS_line316/assets/110130006/494b93d8-83f6-4c23-a437-ab748e7b1125)
@@ -80,7 +80,7 @@
   - Если заготовка является перевернутой, то модуль сверления опускается.
   - После обработки стол поворачивается к изначальной позиции, обработка детали закончена.
 
-[Код станции сверления](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/galaction/logic_procs.go)
+[Код станции сверления](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/Modules/logic_procs.go)
 
 ### 3. Станция упаковки
 ![photo_2024-05-27_18-44-46](https://github.com/Spynch/HS_line316/assets/110130006/7fd1a6e3-e4ea-4f62-ad4f-d0270033e25f)
@@ -88,7 +88,7 @@
 Функции:
   - Коробки поступают на позицию подготовки и открываются, после чего гриппер захватывает обработанный продукт и переносит его на центральную упаковочную станцию. Затем кладет его в коробку и упаковывает.
 
-[Код станции упаковки](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/galaction/logic_packs.go)
+[Код станции упаковки](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/Modules/logic_packs.go)
 
 ### 4. Станция распределения заготовок
  ![photo_2024-05-27_18-44-44](https://github.com/Spynch/HS_line316/assets/110130006/1e70fb35-7167-40b7-9e6b-237a5c021b98)
@@ -97,7 +97,7 @@
   - В зависимости от определенного ранее на станции обработки цвета изделия, запускается соответствующий отсекатель.
   - коробка c заготовкой идёт в нужный накопитель.
 
-[Код станции распределения заготовок](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/galaction/logic_ss.go)
+[Код станции распределения заготовок](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/Modules/logic_ss.go)
 
 ### 5. Имитируемый технологический процесс
  - Шаг 1: Размещение объекта на карусели
@@ -108,7 +108,7 @@
  - Шаг 6: Запуск сортировки
  - Шаг 7: Возврат в исходное положение
 
-[Код Основной процесс(entry)](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/galaction/entry.go)
+[Код Основной процесс(entry)](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/Modules/main.go)
 
 ## hsLineOpc
 * Это [программа](https://github.com/VladislavLowPriority/CS_Packaging_line_316/tree/main/Projects/CS/hsLineOpc), которая читает управляющие теги с сервера на TS и отдает команды установке (т.е. по факту сама СУ).
