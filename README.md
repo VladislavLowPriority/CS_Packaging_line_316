@@ -111,14 +111,14 @@
 [Код Основной процесс(entry)](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Projects/CS/hsLineOpc/internal/Modules/main.go)
 
 ## hsLineOpc
-* Это [программа](https://github.com/VladislavLowPriority/CS_Packaging_line_316/tree/main/Projects/CS/hsLineOpc), которая читает управляющие теги с сервера на TS и отдает команды установке (т.е. по факту сама СУ).
+* Это [программа](https://github.com/VladislavLowPriority/CS_Packaging_line_316/tree/main/Projects/CS/hsLineOpc), которая читает управляющие теги с сервера на TS и отдает команды установке.
 * Сборка:
-  * Для начала надо запустить сервер на TS (см. OPCKuber+GUI) (докер компоста не будет)
+  * Для начала надо запустить сервер на TS (см. OPCKuber+GUI)
   * Версия go 1.24 или выше:
     ```
     go version
     ```
-  * Подтягиваем зависимости:
+  * Устанавливаем зависимости:
     ```
     go mod tidy
     ```
