@@ -12,7 +12,7 @@ import (
 type SS struct {
 	client *api.OpcClient
 
-	// 节点定义
+	// Определение узлов OPC UA
 	BoxOnConveyorTag  *ua.NodeID
 	BoxIsDownTag      *ua.NodeID
 	RedTag            *ua.NodeID
@@ -40,7 +40,7 @@ func NewSS(client *api.OpcClient) *SS {
 }
 
 func (s *SS) Start(ctx context.Context) error {
-	// 读取传感器状态
+	// Чтение состояния датчиков
 	results, err := s.client.ReadBools([]*ua.NodeID{
 		s.BoxOnConveyorTag,
 		s.BoxIsDownTag,
@@ -58,7 +58,7 @@ func (s *SS) Start(ctx context.Context) error {
 	silver := results[3]
 
 	if boxOnConveyor {
-		// 根据颜色推送
+		// Определение цвета для направления
 		var pushNode *ua.NodeID
 		switch {
 		case red:
@@ -72,12 +72,12 @@ func (s *SS) Start(ctx context.Context) error {
 			}
 		}
 
-		// 启动传送带
+		// Запуск конвейера
 		if err := s.client.WriteBools([]*ua.NodeID{s.MoveConveyorRight}, []bool{true}); err != nil {
 			return err
 		}
 
-		// 等待箱子落下
+		// Ожидание падения коробки
 		for !boxIsDown {
 			results, err = s.client.ReadBools([]*ua.NodeID{s.BoxIsDownTag})
 			if err != nil {
@@ -92,7 +92,7 @@ func (s *SS) Start(ctx context.Context) error {
 		}
 	}
 
-	// 停止所有操作
+	// Остановка всех операций
 	return s.client.WriteBools([]*ua.NodeID{
 		s.MoveConveyorRight,
 		s.PushRed,

@@ -13,7 +13,7 @@ import (
 type ProcS struct {
 	client *api.OpcClient
 
-	// 节点定义
+	// Определение узлов OPC UA
 	RedTag         *ua.NodeID
 	SilverTag      *ua.NodeID
 	BlackTag       *ua.NodeID
@@ -60,20 +60,27 @@ func (p *ProcS) Start(ctx context.Context) error {
 			return ctx.Err()
 		default:
 			p.counter++
-			log.Printf("当前计数: %d", p.counter)
+			log.Printf("Текущий счетчик: %d", p.counter)
 
 			switch {
-			case p.counter == 4:
+			case p.counter == 3:
+				log.Printf("Текущий счетчик: 3")
 				time.Sleep(100 * time.Millisecond)
 				if err := p.handleColorDetection(ctx); err != nil {
 					return err
 				}
-			case p.counter == 5:
+				p.client.WriteBools([]*ua.NodeID{p.CarouselRotate}, []bool{true})
+			case p.counter == 4:
+				if err := p.client.WriteBools([]*ua.NodeID{p.CarouselRotate}, []bool{false}); err != nil {
+					return err
+				}
+				log.Printf("Текущий счетчик: 4")
+
 				if err := p.handleDrilling(ctx); err != nil {
 					return err
 				}
-				return nil // 完成流程
-			case p.counter > 5:
+				return nil // Завершение цикла
+			case p.counter > 4:
 				p.counter = -1
 			}
 
@@ -83,13 +90,13 @@ func (p *ProcS) Start(ctx context.Context) error {
 }
 
 func (p *ProcS) handleColorDetection(ctx context.Context) error {
-	// 停止旋转
+	// Остановка вращения
 	if err := p.client.WriteBools([]*ua.NodeID{p.CarouselRotate}, []bool{false}); err != nil {
 
 		return err
 	}
 	time.Sleep(1000 * time.Millisecond)
-	// 颜色检测
+	// Обнаружение цвета
 	results, err := p.client.ReadBools([]*ua.NodeID{p.RedAndSilvery, p.Silvery})
 	if err != nil {
 		return err
@@ -99,21 +106,21 @@ func (p *ProcS) handleColorDetection(ctx context.Context) error {
 	switch {
 	case results[0] && results[1]:
 		targetNode = p.SilverTag
-		log.Println("检测到银色")
+		log.Println("Обнаружен серебряный цвет")
 	case results[0]:
 		targetNode = p.RedTag
-		log.Println("检测到红色")
+		log.Println("Обнаружен красный цвет")
 	default:
 		targetNode = p.BlackTag
-		log.Println("检测到黑色")
+		log.Println("Обнаружен черный цвет")
 	}
 
-	// 设置颜色标签
+	// Установка цветового маркера
 	if err := p.client.WriteBools([]*ua.NodeID{targetNode}, []bool{true}); err != nil {
 		return err
 	}
 
-	// M5操作
+	// Операция M5
 	if err := p.client.WriteBools([]*ua.NodeID{p.M5Toggle}, []bool{true}); err != nil {
 		return err
 	}
@@ -122,17 +129,18 @@ func (p *ProcS) handleColorDetection(ctx context.Context) error {
 		return err
 	}
 
-	// 恢复旋转
-	return p.client.WriteBools([]*ua.NodeID{p.CarouselRotate}, []bool{true})
+	// Возобновление вращения
+	// return p.client.WriteBools([]*ua.NodeID{p.CarouselRotate}, []bool{true})
+	return nil
 }
 
 func (p *ProcS) handleDrilling(ctx context.Context) error {
-	// 停止旋转
+	// Остановка вращения
 	if err := p.client.WriteBools([]*ua.NodeID{p.CarouselRotate}, []bool{false}); err != nil {
 		return err
 	}
 	time.Sleep(1000 * time.Millisecond)
-	// 钻孔操作
+	// Операция сверления
 	steps := []struct {
 		nodes []*ua.NodeID
 		vals  []bool
@@ -158,6 +166,7 @@ func (p *ProcS) handleDrilling(ctx context.Context) error {
 	time.Sleep(200 * time.Millisecond)
 	p.client.WriteBools([]*ua.NodeID{p.CarouselRotate}, []bool{false})
 	p.counter = -1
+	log.Printf("Текущий счетчик: -1")
 	time.Sleep(800 * time.Millisecond)
 	return nil
 }

@@ -25,21 +25,6 @@ func NewClient(connString string) *OpcClient {
 		make(map[string]bool),
 	}
 
-	// client.inputTagMap["ns=4;i=9"] = client.GetNodeValue("ns=4;i=9")
-	// client.inputTagMap["ns=4;i=10"] = client.GetNodeValue("ns=4;i=10")
-	// client.inputTagMap["ns=4;i=24"] = client.GetNodeValue("ns=4;i=24")
-	// client.inputTagMap["ns=4;i=25"] = client.GetNodeValue("ns=4;i=25")
-	// client.inputTagMap["ns=4;i=26"] = client.GetNodeValue("ns=4;i=26")
-
-	// client.inputTagMap["ns=4;i=3"] = client.GetNodeValue("ns=4;i=3")
-	// client.inputTagMap["ns=4;i=4"] = client.GetNodeValue("ns=4;i=4")
-	// client.inputTagMap["ns=4;i=6"] = client.GetNodeValue("ns=4;i=6")
-	// client.inputTagMap["ns=4;i=7"] = client.GetNodeValue("ns=4;i=7")
-
-	// client.inputTagMap["ns=4;i=31"] = client.GetNodeValue("ns=4;i=31")
-	// client.inputTagMap["ns=4;i=30"] = client.GetNodeValue("ns=4;i=30")
-	// client.inputTagMap["ns=4;i=32"] = client.GetNodeValue("ns=4;i=32")
-
 	return client
 }
 
@@ -128,7 +113,7 @@ func (c *OpcClient) WriteNodeValue(nodeId string, value bool) error {
 
 	resp, err := c.Write(req)
 	if err != nil || resp.Results[0] != ua.StatusOK {
-		log.Fatalf("Write failed: %s", err)
+		slog.Error(fmt.Sprintf("Write failed: %s", err))
 	}
 
 	c.outputTagMap[nodeId] = value
@@ -150,23 +135,9 @@ func (c *OpcClient) WriteBools(nodes []*ua.NodeID, values []bool) error {
 
 	start := time.Now()
 	for i, node := range nodes {
-		// writeValues[i] = &ua.WriteValue{
-		// 	NodeID:      node,
-		// 	AttributeID: ua.AttributeIDValue,
-		// 	Value: &ua.DataValue{
-		// 		EncodingMask: ua.DataValueValue,
-		// 		Value:        ua.MustVariant(values[i]),
-		// 	},
-		// }
-
-		c.WriteNodeValue(node.StringID(), values[i])
+		c.WriteNodeValue(node.String(), values[i])
 	}
-
-	// _, err := c.Client.Write(&ua.WriteRequest{
-	// 	NodesToWrite: writeValues,
-	// })
-
-	fmt.Printf("Write %d values - %d ms\n", len(nodes), time.Since(start).Milliseconds())
+	slog.Info(fmt.Sprintf("Write %d values - %d ms\n", len(nodes), time.Since(start).Milliseconds()))
 
 	return nil
 }
@@ -175,7 +146,7 @@ func (c *OpcClient) ReadBools(nodes []*ua.NodeID) ([]bool, error) {
 	start := time.Now()
 	results := make([]bool, 0, len(nodes))
 	for _, node := range nodes {
-		results = append(results, c.GetNodeValue(node.StringID()))
+		results = append(results, c.GetNodeValue(node.String()))
 	}
 
 	slog.Info(fmt.Sprintf("Read %d values - %d ms\n", len(nodes), time.Since(start).Milliseconds()))

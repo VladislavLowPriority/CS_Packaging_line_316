@@ -9,6 +9,8 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -22,8 +24,15 @@ func main() {
 		slog.Error(fmt.Sprintf(".env file load error: %s", err.Error()))
 	}
 
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	startHs(ctx)
+}
+
+func startHs(ctx context.Context) {
 	tsServ := api.NewTsClient(os.Getenv("TS_SERVER_CONN"))
-	err = tsServ.Client.Connect(context.Background())
+	err := tsServ.Client.Connect(context.Background())
 	if err != nil {
 		log.Fatalf("TS server connect error: %s", err.Error())
 	}
@@ -42,31 +51,38 @@ func main() {
 	slog.Info("HS client connected")
 
 	controlSys := handler.NewControlSystem(opcClient)
-	ctx, cancel := context.WithCancel(context.Background())
-	slog.Info("listening for TS server tags")
-	for {
-		if tsServ.Start && !controlSys.IsActive && controlSys.IsDefault {
-			slog.Info("Starting HS line")
-			controlSys.Start(ctx)
-		}
-
-		if tsServ.Stop && controlSys.IsActive {
-			err := controlSys.Stop()
-			if err != nil {
-				slog.Error(err.Error())
-				continue
+	go func() {
+		ctxControl, cancel := context.WithCancel(context.Background())
+		for {
+			if tsServ.Start && !controlSys.IsActive && controlSys.IsDefault {
+				slog.Info("Starting HS line")
+				controlSys.Start(ctxControl)
 			}
 
-			slog.Info("Stopping HS line")
-			cancel()
-			ctx, cancel = context.WithCancel(context.Background())
-		}
+			if tsServ.Stop && controlSys.IsActive {
+				err := controlSys.Stop()
+				if err != nil {
+					slog.Error(err.Error())
+					continue
+				}
 
-		if tsServ.BackToStart && !controlSys.IsActive && !controlSys.IsDefault {
-			slog.Info("Moving to default HS line")
-			controlSys.Default()
-		}
+				slog.Info("Stopping HS line")
+				cancel()
+				ctxControl, cancel = context.WithCancel(context.Background())
+			}
 
-		time.Sleep(time.Millisecond * 10)
-	}
+			if tsServ.BackToStart && !controlSys.IsActive && !controlSys.IsDefault {
+				slog.Info("Moving to default HS line")
+				controlSys.Default()
+			}
+
+			time.Sleep(time.Millisecond * 10)
+		}
+	}()
+	slog.Info("listening for TS server tags")
+
+	<-ctx.Done()
+	slog.Info("Shutting down control system gracefully")
+
+	controlSys.Stop()
 }

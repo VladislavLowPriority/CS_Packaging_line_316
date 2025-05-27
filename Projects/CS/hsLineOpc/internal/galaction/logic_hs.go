@@ -1,3 +1,4 @@
+// logic_hs.go
 package galaction
 
 import (
@@ -13,12 +14,12 @@ import (
 type HS struct {
 	client *api.OpcClient
 
-	// 输入节点
+	// Входные узлы
 	gripperStartSensor    *ua.NodeID
 	gripperPackSensor     *ua.NodeID
 	gripperConveyorSensor *ua.NodeID
-
-	// 输出节点
+	CarouselRotate        *ua.NodeID
+	// Выходные узлы
 	gripperToggleUpDown *ua.NodeID
 	gripperOpen         *ua.NodeID
 	gripperMoveLeft     *ua.NodeID
@@ -45,12 +46,13 @@ func NewHS(client *api.OpcClient) *HS {
 		yellowTag:             MustParseNodeID("ns=4;i=35"),
 		pushBox:               MustParseNodeID("ns=4;i=43"),
 		fixBoxUpperSide:       MustParseNodeID("ns=4;i=44"),
+		CarouselRotate:        MustParseNodeID("ns=4;i=13"),
 	}
 }
 
 func (h *HS) GrDown(ctx context.Context, duration time.Duration) error {
 	if err := h.client.WriteBools([]*ua.NodeID{h.gripperToggleUpDown}, []bool{true}); err != nil {
-		return fmt.Errorf("夹爪下降失败: %w", err)
+		return fmt.Errorf("ошибка опускания захвата:  %w", err)
 	}
 	select {
 	case <-time.After(duration):
@@ -62,14 +64,14 @@ func (h *HS) GrDown(ctx context.Context, duration time.Duration) error {
 
 func (h *HS) GrUp(ctx context.Context) error {
 	if err := h.client.WriteBools([]*ua.NodeID{h.gripperToggleUpDown}, []bool{false}); err != nil {
-		return fmt.Errorf("夹爪上升失败: %w", err)
+		return fmt.Errorf("ошибка подъема захвата:  %w", err)
 	}
 	time.Sleep(1500 * time.Millisecond)
 	return nil
 }
 
 func (h *HS) GrMovePuckToCarousel(ctx context.Context) error {
-	// 初始化输出状态
+	// Инициализация состояний
 	if err := h.client.WriteBools([]*ua.NodeID{
 		h.yellowTag,
 		h.greenTag,
@@ -83,7 +85,7 @@ func (h *HS) GrMovePuckToCarousel(ctx context.Context) error {
 		return err
 	}
 
-	// 抓取流程
+	// Процесс захвата
 	if err := h.client.WriteBools([]*ua.NodeID{h.gripperOpen}, []bool{true}); err != nil {
 		return err
 	}
@@ -98,7 +100,7 @@ func (h *HS) GrMovePuckToCarousel(ctx context.Context) error {
 		return err
 	}
 
-	// 向左移动
+	// Движение влево
 	if err := h.client.WriteBools([]*ua.NodeID{h.gripperMoveLeft}, []bool{true}); err != nil {
 		return err
 	}
@@ -107,7 +109,7 @@ func (h *HS) GrMovePuckToCarousel(ctx context.Context) error {
 		return err
 	}
 
-	// 放置物体
+	// Размещение объекта
 	if err := h.GrDown(ctx, 2*time.Second); err != nil {
 		return err
 	}
@@ -118,7 +120,7 @@ func (h *HS) GrMovePuckToCarousel(ctx context.Context) error {
 }
 
 func (h *HS) GrMovePuckToPack(ctx context.Context) error {
-	// 抓取物体
+	// Захват объекта
 	if err := h.client.WriteBools([]*ua.NodeID{h.gripperOpen}, []bool{true}); err != nil {
 		return err
 	}
@@ -133,19 +135,19 @@ func (h *HS) GrMovePuckToPack(ctx context.Context) error {
 		return err
 	}
 
-	// 向右移动直到传感器触发
+	// Движение вправо до срабатывания датчика
 	start := time.Now()
 	for {
 		vals, err := h.client.ReadBools([]*ua.NodeID{h.gripperPackSensor})
 		if err != nil {
-			return fmt.Errorf("读取包装传感器失败: %w", err)
+			return fmt.Errorf("ошибка чтения датчика упаковки: %w", err)
 		}
 		if vals[0] {
 			break
 		}
 
 		if time.Since(start) > 10*time.Second {
-			return fmt.Errorf("移动至包装位置超时")
+			return fmt.Errorf("таймаут перемещения к упаковке")
 		}
 
 		if err := h.client.WriteBools([]*ua.NodeID{h.gripperMoveRight}, []bool{true}); err != nil {
@@ -154,7 +156,7 @@ func (h *HS) GrMovePuckToPack(ctx context.Context) error {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	// 推送盒子
+	// Активация толкателя
 	if err := h.client.WriteBools([]*ua.NodeID{h.gripperMoveRight, h.pushBox}, []bool{false, true}); err != nil {
 		return err
 	}
@@ -163,7 +165,7 @@ func (h *HS) GrMovePuckToPack(ctx context.Context) error {
 }
 
 func (h *HS) GrMovePuckToConveyor(ctx context.Context) error {
-	// 抓取物体
+	// Захват объекта
 	if err := h.client.WriteBools([]*ua.NodeID{h.gripperOpen}, []bool{true}); err != nil {
 		return err
 	}
@@ -178,12 +180,12 @@ func (h *HS) GrMovePuckToConveyor(ctx context.Context) error {
 		return err
 	}
 
-	// 向右移动
+	// Движение вправо
 	startTime := time.Now()
 	for {
 		sensorVals, err := h.client.ReadBools([]*ua.NodeID{h.gripperConveyorSensor})
 		if err != nil {
-			return fmt.Errorf("读取传送带传感器失败: %w", err)
+			return fmt.Errorf("ошибка чтения датчика конвейера: %w", err)
 		}
 
 		if sensorVals[0] {
@@ -191,7 +193,7 @@ func (h *HS) GrMovePuckToConveyor(ctx context.Context) error {
 		}
 
 		if time.Since(startTime) > 10*time.Second {
-			return fmt.Errorf("移动至传送带超时")
+			return fmt.Errorf("таймаут перемещения к конвейеру")
 		}
 
 		if err := h.client.WriteBools([]*ua.NodeID{h.gripperMoveRight}, []bool{true}); err != nil {
@@ -200,7 +202,7 @@ func (h *HS) GrMovePuckToConveyor(ctx context.Context) error {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	// 放置物体
+	// Размещение объекта
 	if err := h.GrDown(ctx, 2*time.Second); err != nil {
 		return err
 	}
@@ -213,21 +215,21 @@ func (h *HS) GrMovePuckToConveyor(ctx context.Context) error {
 
 func (h *HS) GrMoveToStart(ctx context.Context) error {
 
-	// 向左移动直到起始传感器触发
+	// Движение влево до срабатывания датчика
 	start := time.Now()
 
 	h.client.WriteBools([]*ua.NodeID{h.gripperMoveRight}, []bool{false})
 	for {
 		vals, err := h.client.ReadBools([]*ua.NodeID{h.gripperStartSensor})
 		if err != nil {
-			return fmt.Errorf("读取起始传感器失败: %w", err)
+			return fmt.Errorf("ошибка чтения стартового датчика: %w", err)
 		}
 		if vals[0] {
 			break
 		}
 
 		if time.Since(start) > 15*time.Second {
-			return fmt.Errorf("返回起始位置超时")
+			return fmt.Errorf("таймаут возврата в исходное положение")
 		}
 
 		if err := h.client.WriteBools([]*ua.NodeID{h.gripperMoveLeft}, []bool{true}); err != nil {
@@ -236,13 +238,14 @@ func (h *HS) GrMoveToStart(ctx context.Context) error {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	// 停止移动并更新状态灯
+	// Остановка и обновление индикаторов
 	if err := h.client.WriteBools([]*ua.NodeID{
+		h.CarouselRotate,
 		h.gripperMoveRight,
 		h.gripperMoveLeft,
 		h.greenTag,
 		h.yellowTag,
-	}, []bool{false, false, false, true}); err != nil {
+	}, []bool{false, false, false, false, true}); err != nil {
 		return err
 	}
 	return nil

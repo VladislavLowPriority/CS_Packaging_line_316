@@ -10,15 +10,15 @@ import (
 )
 
 func EntryStartHs(ctx context.Context, hsClient *api.OpcClient) {
-	// 初始化各模块
+	// Инициализация модулей
 	hs := NewHS(hsClient)
 	packs := NewPackS(hsClient)
 	procs := NewProcS(hsClient)
 	ss := NewSS(hsClient)
 
-	// 主控制流程
+	// Главный управляющий цикл
 	if err := controlLoop(ctx, hs, procs, packs, ss); err != nil {
-		log.Fatal("控制流程错误: ", err)
+		log.Fatal("Ошибка управляющего процесса:  ", err)
 	}
 }
 
@@ -28,11 +28,11 @@ func controlLoop(ctx context.Context, hs *HS, procs *ProcS, packs *PackS, ss *SS
 		case <-ctx.Done():
 			return nil
 		default:
-			// 完整工作流程
+			// Полный рабочий цикл
 			if err := workflow(ctx, hs, procs, packs, ss); err != nil {
 				return err
 			}
-			log.Println("完成一个工作周期，等待下一次触发...")
+			log.Println("Завершён рабочий цикл, ожидание следующего запуска...")
 			time.Sleep(5 * time.Second)
 		}
 	}
@@ -40,36 +40,36 @@ func controlLoop(ctx context.Context, hs *HS, procs *ProcS, packs *PackS, ss *SS
 
 func workflow(ctx context.Context, hs *HS, procs *ProcS, packs *PackS, ss *SS) error {
 	hs.GrMoveToStart(ctx)
-	// 步骤1: 放置物体到转盘
+	// Шаг 1: Размещение объекта на карусели
 	if err := hs.GrMovePuckToCarousel(ctx); err != nil {
-		return fmt.Errorf("放置物体失败: %w", err)
+		return fmt.Errorf("Ошибка размещения объекта: %w", err)
 	}
 
-	// 步骤2: 执行加工流程
+	// Шаг 2: Запуск процесса обработки
 	if err := procs.Start(ctx); err != nil {
-		return fmt.Errorf("加工流程失败: %w", err)
+		return fmt.Errorf("Ошибка процесса обработки:  %w", err)
 	}
 
-	// 步骤3: 移动到包装位置
+	// Шаг 3: Перемещение к упаковке
 	if err := hs.GrMovePuckToPack(ctx); err != nil {
-		return fmt.Errorf("移动至包装失败: %w", err)
+		return fmt.Errorf("Ошибка перемещения к упаковке: %w", err)
 	}
 
-	// 步骤4: 执行包装
+	// Шаг 4: Запуск упаковки
 	if err := packs.Start(ctx); err != nil {
-		return fmt.Errorf("包装失败: %w", err)
+		return fmt.Errorf("Ошибка упаковки:  %w", err)
 	}
 
-	// 步骤5: 移动到分拣位置
+	// Шаг 5: Перемещение к сортировке
 	if err := hs.GrMovePuckToConveyor(ctx); err != nil {
-		return fmt.Errorf("移动至分拣失败: %v", err)
+		return fmt.Errorf("Ошибка перемещения к сортировке: %v", err)
 	}
 
-	// 步骤6: 执行分拣
+	// Шаг 6: Запуск сортировки
 	if err := ss.Start(ctx); err != nil {
-		return fmt.Errorf("分拣失败: %w", err)
+		return fmt.Errorf("Ошибка сортировки: %w", err)
 	}
 
-	// 步骤7: 返回起始位置
+	// Шаг 7: Возврат в исходное положение
 	return hs.GrMoveToStart(ctx)
 }
