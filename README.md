@@ -39,8 +39,8 @@
 [HS Line 316](https://github.com/anvax/HS_line316?tab=readme-ov-file#%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D1%8B)
 
 ## Архитектура
-ПЛК взаимодействут друг с другом благодаря стандарту Profinet 
-![изображение](https://github.com/n0th1ngs89/HS_Line_316_I-O/assets/146949002/05848d01-be59-402f-ab1c-b9a10d6a265b)
+
+![изображение]([https://github.com/n0th1ngs89/HS_Line_316_I-O/assets/146949002/05848d01-be59-402f-ab1c-b9a10d6a265b](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/image.png))
 
 ## Ход работы:
 ## Протокол EtherNet/IP
