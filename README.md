@@ -40,7 +40,7 @@
 
 ## Архитектура
 
-![изображение]([https://github.com/n0th1ngs89/HS_Line_316_I-O/assets/146949002/05848d01-be59-402f-ab1c-b9a10d6a265b](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/image.png))
+![изображение](https://github.com/VladislavLowPriority/CS_Packaging_line_316/blob/main/Documentation/image.png)
 
 ## Ход работы:
 ## Протокол EtherNet/IP
